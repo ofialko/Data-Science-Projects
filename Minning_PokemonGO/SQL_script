@@ -1,0 +1,49 @@
+CREATE TABLE tweets.languages (
+    id                 INTEGER PRIMARY KEY,
+    Language           TEXT,
+    [Number of tweets] INTEGER
+);
+
+
+
+INSERT INTO tweets.languages (
+                                 Language,
+                                 [Number of tweets]
+                             )
+                             SELECT lang,
+                                    count( * ) 
+                               FROM tweets.tweets
+                              GROUP BY lang
+                              ORDER BY count( * ) DESC;
+
+
+CREATE TABLE tweets.source (
+    id                 INTEGER PRIMARY KEY,
+    source             TEXT,
+    [Number of tweets] INTEGER
+);
+
+
+INSERT INTO tweets.source (
+                              source,
+                              [Number of tweets]
+                          )
+                          SELECT source,
+                                 count( * ) 
+                            FROM tweets.tweets
+                           GROUP BY source
+                           ORDER BY count( * ) DESC;
+
+
+SELECT location,
+       count( * ) AS [Number of tweets]
+  FROM tweets.tweets
+ GROUP BY location
+ ORDER BY count( * ) DESC;
+
+SELECT count( * ) 
+  FROM tweets;
+
+SELECT content
+  FROM tweets
+ LIMIT 20;
