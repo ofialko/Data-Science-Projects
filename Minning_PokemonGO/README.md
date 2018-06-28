@@ -19,21 +19,20 @@ Popularity of Pokemon GO by
  * language:
 
 ![Language][lan]
-[lan]: Figures/Language.png
+[lan]: https://github.com/ofialko/Data-Science-Projects/blob/master/Minning_PokemonGO/Figures/Language.png
 
 
  * source
 
 ![Language][sou]
-[sou]: Figures/Sources.png
+[sou]: https://github.com/ofialko/Data-Science-Projects/blob/master/Minning_PokemonGO/Figures/Sources.png
 
  * location
 
 ![Language][loc]
-[loc]: Figures/Location.png
-
+[loc]: https://github.com/ofialko/Data-Science-Projects/blob/master/Minning_PokemonGO/Figures/Location.png
 
 Pokemon was very popular game at the time I was doing this project. This is well supported by sentimental analysis of the statuses written in English. As can be seen from the pie-chart below there were much more positive statuses than negative.
 
 ![Language][sen]
-[sen]: Figures/Sentiment.png
+[sen]: https://github.com/ofialko/Data-Science-Projects/blob/master/Minning_PokemonGO/Figures/Sentiment.png
