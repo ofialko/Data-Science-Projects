@@ -11,4 +11,4 @@ Here, I provide several trained agents. The following algorithms were used:
   * Value iteration
   * Policy iteration
   * Q-learning
-  * Deep Reinforcement Learning
+  * Deep Reinforcement learning
