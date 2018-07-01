@@ -12,6 +12,3 @@ Here, I provide several solutions. The following algorithms were used:
   * Deep Reinforcement learning
 
   
-  ![alt text][logo]
-
-  [logo]:https://github.com/ofialko/Data-Science-Projects/blob/master/Reinforcement_Learning/Results/openaigym.video.0.7571.video000000.mp4
