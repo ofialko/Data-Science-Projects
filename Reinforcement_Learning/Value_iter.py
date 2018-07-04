@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 
-class PolicyAgent(object):
+class ValueAgent(object):
     def __init__(self,env,max_iter):
         self.gamma = 1
         self.env = env
@@ -64,7 +64,7 @@ class PolicyAgent(object):
 if __name__ == '__main__':
     env = gym.make('FrozenLake8x8-v0')
 
-    agent = PolicyAgent(env,10000)
+    agent = ValueAgent(env,10000)
     agent.train()
     print('Training Done')
     reward = agent.run_episode(render=True)
