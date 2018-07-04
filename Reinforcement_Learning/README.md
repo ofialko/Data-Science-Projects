@@ -1,12 +1,15 @@
 ## Reinforcement Learning
 
 I have finished learning Reinforcement Learning (RL) on Udacity, [Reinforcement Learning by Georgia Tech](https://www.udacity.com/course/reinforcement-learning--ud600).
-That course provides solid theoretical foundation, but it does not have practical
-assignments. I decided to practice different RL algorithms myself by solving one of the classic control agents, namely [Mountain Car](https://gym.openai.com/envs/#classic_control).
+That course provides solid theoretical foundation, but it does not have practical assignments. The best way to learn something is to practice.
+I decided to practice different RL algorithms myself by solving various RL agents provided by GYM open source library
+(https://gym.openai.com/envs).
 
-Here, I provide several solutions based on the following algorithms:
+The following algorithms have been implemented:
 
-  * Random search
-  * Genetic algorithm
-  * Q-learning
-  * Deep Reinforcement learning
+  * Random search (Mountain car)
+  * Genetic algorithm (Mountain car)
+  * Q-learning (Mountain car)
+  * Value iteration (Frozen Lake)
+  * Policy iteration (Frozen Lake)
+  * Deep Reinforcement learning (Pong)
