@@ -1,12 +1,30 @@
-from fastai.imports import *
+#from fastai.imports import *
 import pandas as pd
 import re, math
 import feather
+from tqdm import tqdm
 import numpy as np
 from sklearn.ensemble import forest
 from sklearn.tree import export_graphviz
 import matplotlib.pyplot as plt
-import graphviz
+from urllib.request import urlretrieve
+import graphviz, IPython
+import gzip, os
+
+class TqdmUpTo(tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None: self.total = tsize
+        self.update(b * bsize - self.n)
+
+def get_data(url, filename):
+    if not os.path.exists(filename):
+
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+
+        with TqdmUpTo(unit='B', unit_scale=True, miniters=1, desc=url.split('/')[-1]) as t:
+            urlretrieve(url, filename, reporthook=t.update_to)
 
 def set_plot_sizes(sml, med, big):
     plt.rc('font', size=sml)          # controls default text sizes
