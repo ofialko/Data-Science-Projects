@@ -1,6 +1,7 @@
 #from fastai.imports import *
 import pandas as pd
 import re, math
+from glob import glob
 import feather
 from tqdm import tqdm
 import numpy as np
@@ -10,6 +11,15 @@ import matplotlib.pyplot as plt
 from urllib.request import urlretrieve
 import graphviz, IPython
 import gzip, os
+
+def texts_labels_from_folders(path, folders):
+    texts,labels = [],[]
+    for idx,label in enumerate(folders):
+        for fname in glob(os.path.join(path, label, '*.*')):
+            texts.append(open(fname, 'r').read())
+            labels.append(idx)
+    return texts, np.array(labels).astype(np.int64)
+
 
 class TqdmUpTo(tqdm):
     def update_to(self, b=1, bsize=1, tsize=None):
