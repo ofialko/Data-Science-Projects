@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "pytorch"
+version = "0.1.0"
+description = ""
+authors = ["Oleksandr Fialko <Oleksandr.Fialko@qrious.co.nz>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+torch = "torchvision"
+torchvision = "^0.8.1"
+scikit-build = "^0.11.1"
+SimpleITK = "^2.0.1"
+jupyterlab = "^2.2.9"
+pandas = "^1.1.4"
+diskcache = "4.1.0"
+matplotlib = "^3.3.3"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
