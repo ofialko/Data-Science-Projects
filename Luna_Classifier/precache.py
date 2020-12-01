@@ -1,12 +1,11 @@
 
 from torch.utils.data import DataLoader
-import logging
+from config.logconfig import logging
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 from collections import namedtuple
-#log.info(__file__)
 
 from dsets import LunaDataset
 from utils import enumerateWithEstimate

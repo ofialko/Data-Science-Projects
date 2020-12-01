@@ -8,7 +8,8 @@ import numpy as np
 from torch.utils.data import Dataset
 import torch
 import copy
-import logging
+import json
+from config.logconfig import logging
 from utils import getCache
 
 
@@ -22,8 +23,12 @@ CandidateInfoTuple = namedtuple(
           'isNodule_bool, diameter_mm, series_uid, center_xyz',
 )
 
-data_path = Path('/home/ubuntu/data/code/data-unversioned/part1/luna/')
-raw_cache = getCache(data_path / 'cache/part2ch10_raw')
+json_config = 'config/data_config.json'
+with open(json_config,'r') as fp:
+        data_conf = json.load(fp)
+        data_path = Path(data_conf['output_dir'])
+
+raw_cache = getCache(data_path / 'cache_raw')
 
 
 
