@@ -9,8 +9,8 @@ from torch.utils.data import Dataset
 import torch
 import copy
 import json
-from config.logconfig import logging
-from utils import getCache
+from src.config.logconfig import logging
+from src.utils import getCache
 
 
 log = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ CandidateInfoTuple = namedtuple(
           'isNodule_bool, diameter_mm, series_uid, center_xyz',
 )
 
-json_config = 'config/data_config.json'
+json_config = Path('/tmp/myapp/src/config/data_config.json')
 with open(json_config,'r') as fp:
         data_conf = json.load(fp)
         data_path = Path(data_conf['output_dir'])
@@ -105,6 +105,7 @@ class Ct:
     def __init__(self, series_uid):
         mhd_path = next(data_path.glob(f'subset*/{series_uid}.mhd'))             
         ct_mhd = sitk.ReadImage(mhd_path.as_posix())
+        # 3D array
         ct_a = np.array(sitk.GetArrayFromImage(ct_mhd), dtype=np.float32)
 
         # CTs are natively expressed in https://en.wikipedia.org/wiki/Hounsfield_scale

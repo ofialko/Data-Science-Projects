@@ -3,3 +3,6 @@ build:
 
 run:
 	docker run -v $$(pwd)/Project:/tmp/myapp -p 8888:8888 --rm --name luna_container luna_image
+
+bash:
+	docker exec -it luna_container /bin/bash
