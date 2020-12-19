@@ -1,14 +1,14 @@
 
 from torch.utils.data import DataLoader
-from config.logconfig import logging
+from src.config.logconfig import logging
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 from collections import namedtuple
 
-from dsets import LunaDataset
-from utils import enumerateWithEstimate
+from src.dsets import LunaDataset
+from src.utils import enumerateWithEstimate
     
 cli_args = namedtuple('cli_args',['batch_size', 'num_workers'])
 cli_args.batch_size = 10
