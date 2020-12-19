@@ -1,5 +1,9 @@
 import zipfile
 import pathlib as pl
+from src.logconfig import logging
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 data_path = pl.Path('/tmp/myapp/data/')
 archive_file = [f for f in list(data_path.glob('*.*')) if f.name.endswith('zip')][0]
@@ -20,5 +24,6 @@ def extract_files(
 
             # Check filename endswith csv
             if file_ in list_of_files:
+                log.info(f'Extracting {file_} ...')
                 # Extract a single file from zip
                 zip_file.extract(file_, output_dir)

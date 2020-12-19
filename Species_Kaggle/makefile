@@ -7,6 +7,5 @@ run:
 bash:
 	docker exec -it species_container /bin/bash
 
-mv_poetry:
+cp_poetry:
 	docker cp species_container:/tmp/pyproject.toml .
-	docker cp species_container:/tmp/poetry.lock .
