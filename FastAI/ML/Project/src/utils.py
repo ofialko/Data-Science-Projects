@@ -2,15 +2,19 @@
 import pandas as pd
 import re, math
 from glob import glob
-import feather
 from tqdm import tqdm
 import numpy as np
-from sklearn.ensemble import forest
+#from sklearn.ensemble import forest
 from sklearn.tree import export_graphviz
 import matplotlib.pyplot as plt
 from urllib.request import urlretrieve
 import graphviz, IPython
 import gzip, os
+import warnings
+import sklearn
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from pandas.api.types import is_string_dtype, is_numeric_dtype
+from sklearn_pandas import DataFrameMapper
 
 def texts_labels_from_folders(path, folders):
     texts,labels = [],[]
@@ -104,6 +108,13 @@ def apply_cats(df, trn):
         if (n in trn.columns) and (trn[n].dtype.name=='category'):
             df[n] = pd.Categorical(c, categories=trn[n].cat.categories, ordered=True)
 
+def scale_vars(df, mapper):
+    warnings.filterwarnings('ignore', category=sklearn.exceptions.DataConversionWarning)
+    if mapper is None:
+        map_f = [([n],StandardScaler()) for n in df.columns if is_numeric_dtype(df[n])]
+        mapper = DataFrameMapper(map_f).fit(df)
+    df[mapper.transformed_names_] = mapper.transform(df)
+    return mapper
 
 def proc_df(df, y_fld=None, skip_flds=None, ignore_flds=None, do_scale=False, na_dict=None,
             preproc_fn=None, max_n_cat=None, subset=None, mapper=None):
@@ -220,7 +231,15 @@ def numericalize(df, col, name, max_n_cat):
     """
     if not pd.api.types.is_numeric_dtype(col) and ( max_n_cat is None or len(col.cat.categories)>max_n_cat):
         df[name] = col.cat.codes+1
-        
+
+def get_cv_idxs(n, cv_idx=0, val_pct=0.2, seed=42):
+    np.random.seed(seed)
+    n_val = int(val_pct*n)
+    idx_start = cv_idx*n_val
+    idxs = np.random.permutation(n)
+    return idxs[idx_start:idx_start+n_val]
+
+
 def get_sample(df,n):
     """ Gets a random sample of n rows from df, without replacement.
 
