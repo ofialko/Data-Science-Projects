@@ -19,6 +19,7 @@ graphviz = "^0.16"
 plotly = "^4.14.0"
 plotly-express = "0.4.0"
 ipywidgets = "^7.5.0"
+sklearn-pandas = "^2.0.4"
 
 [tool.poetry.dev-dependencies]
 

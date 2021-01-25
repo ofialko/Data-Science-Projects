@@ -16,6 +16,8 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from pandas.api.types import is_string_dtype, is_numeric_dtype
 from sklearn_pandas import DataFrameMapper
 
+
+
 def texts_labels_from_folders(path, folders):
     texts,labels = [],[]
     for idx,label in enumerate(folders):

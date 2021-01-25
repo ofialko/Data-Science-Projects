@@ -6,3 +6,6 @@ run:
 
 bash:
 	docker exec -it ml_container /bin/bash
+
+update_toml:
+	docker cp ml_container:/tmp/pyproject.toml . 
