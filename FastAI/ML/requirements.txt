@@ -1,0 +1,14 @@
+torch>=1.7.0
+scikit-learn>=0.24.0
+jupyterlab>=3.0.0
+pandas>=1.1.0
+matplotlib>=3.3.3
+tqdm>=4.54.0
+jedi==0.17.2
+pyarrow>=2.0.0
+aquirdturtle-collapsible-headings>=3.0.1
+graphviz>=0.16
+plotly>=4.14.0
+plotly-express>=0.4.0
+ipywidgets>=7.5.0
+sklearn-pandas>=2.0.4
