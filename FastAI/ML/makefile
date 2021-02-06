@@ -21,7 +21,7 @@ upload_to_collab:
 
 update_src_drive:
 	rm -rf ~/Google\ Drive/src/src_$(notebook)
-	cp -r Project/src ~/Google\ Drive/src/src_$(notebook)
+	cp -r Project/src ~/Google\ Drive/src/src_$(notebook)mk
 
 update_from_colab:
 	cp ~/Google\ Drive/Colab\ Notebooks/$(notebook).ipynb Project/Notebooks/.

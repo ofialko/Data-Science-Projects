@@ -105,14 +105,26 @@ def validate(stepper, dl, metrics):
         res.append([f(to_np(preds),to_np(y)) for f in metrics])
     return [np.mean(loss)] + list(np.mean(np.stack(res),0))
 
+def calc_lr(lr_init,nb,cycle_iter):
+    # if iteration<nb/20:
+    #     cycle_iter += 1
+    #     return init_lr/100.
+    lr_min = lr_init / 100
+    cos_out = np.cos(np.pi*(cycle_iter)/nb) + 1
+    # if cycle_iter==nb:
+    #     cycle_iter = 0
+    #     cycle_count += 1
+    return lr_min + (lr_init - lr_min) / 2 * cos_out
+
 
 class Learner():
     def __init__(self, data, model, opt_fn=None, metrics=None):
         self.data, self.model ,self.metrics = data, model, metrics
         self.opt_fn = opt_fn #or SGD_Momentum(0.9)
         self.crit,self.reg_fn = F.mse_loss,None
+        self.opt = self.opt_fn(self.model.parameters())
 
-    def fit(self, lr, epochs):
+    def fit(self, lr, epochs, update_lr = False):
         """ Fits a model
 
         Arguments:
@@ -124,12 +136,15 @@ class Learner():
            crit: loss function to optimize. Example: F.cross_entropy
            
         """
-        opt = self.opt_fn(self.model.parameters(), lr)
-        stepper = Stepper(self.model, opt, self.crit)
+        # update lr
+        self.opt.param_groups[0]['lr'] = lr
+        stepper = Stepper(self.model, self.opt, self.crit)
         #metrics = self.metrics or []
         avg_mom = 0.98
         batch_num = 0 
         avg_loss = 0
+        cycle_iter = 0
+        nb = len(self.data.trn_dl)
 
         for epoch in trange(epochs, desc='Epoch'):
             stepper.reset(True)
@@ -137,19 +152,25 @@ class Learner():
             # t = iter(self.data.trn_dl)
             for (*x,y) in self.data.trn_dl:
                 batch_num += 1
+                cycle_iter += 1
+
+                if update_lr:
+                    new_lr = calc_lr(lr, nb, cycle_iter)
+                    # update lr
+                    stepper.opt.param_groups[0]['lr'] = new_lr
             
                 loss = stepper.step(to_gpu(x),to_gpu(y))
                 avg_loss = avg_loss * avg_mom + loss * (1-avg_mom)
                 debias_loss = avg_loss / (1 - avg_mom**batch_num)
+
+                if cycle_iter==nb:
+                    cycle_iter = 0
                 #t.set_postfix(loss=debias_loss)
 
-                stop=False
-                if stop: return
             print('loss:', debias_loss)
             vals = validate(stepper, self.data.val_dl, self.metrics)
             print(np.round([epoch, debias_loss] + vals, 6))
-            stop=False
-            if stop: break
+            
                 
     
     def predict(self, is_test=False):
