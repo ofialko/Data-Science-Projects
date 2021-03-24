@@ -3,10 +3,10 @@ FROM python:3.8-slim
 ENV PYTHONPATH="/tmp/myapp"
 
 # setup poetry
-RUN pip install poetry
 WORKDIR /tmp/
-COPY pyproject.toml .
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-root
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+RUN jupyter serverextension enable --sys-prefix voila 
 
 CMD ["jupyter", "lab", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
