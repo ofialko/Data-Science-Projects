@@ -2,11 +2,8 @@ FROM python:3.8-slim
 
 ENV PYTHONPATH="/tmp/myapp"
 
-# setup poetry
-RUN pip install poetry
-WORKDIR /tmp/
-COPY pyproject.toml .
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-root
+# setup python
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 CMD ["jupyter", "lab", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]

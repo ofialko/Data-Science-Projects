@@ -1,8 +1,8 @@
 build:
-	docker build -t luna_image .
+	docker build -t 3d_image .
 
 run:
-	docker run -v $$(pwd)/Project:/tmp/myapp -p 8888:8888 --rm --name luna_container luna_image
+	docker run -v $$(pwd)/Project:/tmp/myapp -p 8888:8888 --rm --name 3d_container 3d_image
 
 bash:
-	docker exec -it luna_container /bin/bash
+	docker exec -it 3d_container /bin/bash
