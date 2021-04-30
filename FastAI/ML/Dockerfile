@@ -9,12 +9,13 @@ RUN apt install -y nodejs
 
 
 # setup poetry
-RUN pip install poetry
+# RUN pip install poetry
 WORKDIR /tmp/
-COPY pyproject.toml .
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-root
-
+# COPY pyproject.toml .
+COPY requirements.txt .
+# RUN poetry config virtualenvs.create false
+# RUN poetry install --no-root
+RUN pip install -r requirements.txt
 
 RUN jupyter labextension install jupyterlab-plotly@4.14.3
 
