@@ -4,8 +4,8 @@ pandas
 matplotlib
 plotly
 tqdm
-#torch
-#torchvision
+torch
+torchvision
 scikit-build
 SimpleITK == 2.0.1
 diskcache == 4.1.0

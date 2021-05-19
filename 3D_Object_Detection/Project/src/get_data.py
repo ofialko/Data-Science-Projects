@@ -186,7 +186,7 @@ class getData:
     def from_config(cls):
         return cls(url, data_path)
 
-
+    
     def stream(self):
         # Streaming, so we can iterate over the response.
         log.info(f"Starting reading {self.file_name}")
@@ -211,3 +211,4 @@ if __name__ == "__main__":
     #json_config = Path('src/config') / 'data_config.json'
     #getData.from_json(json_config).stream()
     getData.from_config().stream()
+    
