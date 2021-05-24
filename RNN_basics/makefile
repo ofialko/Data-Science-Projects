@@ -1,3 +1,5 @@
+src_colab = src_rnn
+
 build:
 	docker build -t rnn_basics_image .
 
@@ -12,16 +14,14 @@ update_toml:
 
 upload_to_collab:
 	cp Project/Notebooks/$(notebook).ipynb ~/Google\ Drive/Colab\ Notebooks/.
-	rm -rf ~/Google\ Drive/data/data_3D
-	cp -r Project/data ~/Google\ Drive/data/data_3D
-	rm -rf ~/Google\ Drive/src/src_3D
-	cp -r Project/src ~/Google\ Drive/src/src_3D
-	cp requirements_collab.txt ~/Google\ Drive/src/src_3D/.
+	rm -rf ~/Google\ Drive/src/$(src_colab)
+	cp -r Project/src ~/Google\ Drive/src/$(src_colab)
+	cp requirements_collab.txt ~/Google\ Drive/src/$(src_colab)/.
 
 update_src_drive:
-	rm -rf ~/Google\ Drive/src/src_3D
-	cp -r Project/src ~/Google\ Drive/src/src_3D
-	cp requirements_collab.txt ~/Google\ Drive/src/src_3D/.
+	rm -rf ~/Google\ Drive/src/$(src_colab)
+	cp -r Project/src ~/Google\ Drive/src/$(src_colab)
+	cp requirements_collab.txt ~/Google\ Drive/src/$(src_colab)/.
 
 update_from_colab:
 	cp ~/Google\ Drive/Colab\ Notebooks/$(notebook).ipynb Project/Notebooks/.
