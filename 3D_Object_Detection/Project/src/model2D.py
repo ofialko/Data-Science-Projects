@@ -12,7 +12,7 @@ class NetResDeep(nn.Module):
     def __init__(self, n_chans1=32, n_blocks=10):
         super().__init__()
         self.n_chans1 = n_chans1
-        self.conv1 = nn.Conv2d(3, n_chans1, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(in_channels =3, out_channels = self.n_chans1, kernel_size=3, padding=1)
         self.resblocks = nn.Sequential(
             *(n_blocks * [ResBlock(n_chans=n_chans1)]))
         self.fc1 = nn.Linear(8 * 8 * n_chans1, 32)
