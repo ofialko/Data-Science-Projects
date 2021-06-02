@@ -1,27 +1,42 @@
+project := $(shell basename $(abspath $(dir $$PWD)))
+
+src_colab = src_$(project)
+data_colab = data_$(project)
+notebook_colab = notebook_$(project)
+image = image_$(project)
+container = container_$(project)
+
+gdrive_path = Google\ Drive\ \(oleksandrfialko@gmail.com\)
+
+env:
+	echo $(gdrive_path)
+
 build:
-	docker build -t 3d_image .
+	docker build -t $(image) .
 
 run:
-	docker run -v $$(pwd)/Project:/tmp/myapp -p 8888:8888 --rm --name 3d_container 3d_image
+	docker run -v $$(pwd)/Project:/tmp/myapp -p 8888:8888 --rm --name $(container) $(image)
 
 bash:
-	docker exec -it 3d_container /bin/bash
+	docker exec -it $(container) /bin/bash
 
 update_container_requirements:
-	docker cp 3d_container:/tmp/requirements.txt . 
+	docker cp $(container):/tmp/requirements.txt . 
 
 init_collab:
-	cp Project/Notebooks/$(notebook).ipynb ~/Google\ Drive/Colab\ Notebooks/.
-	rm -rf ~/Google\ Drive/data/data_3D
-	cp -r Project/data ~/Google\ Drive/data/data_3D
-	rm -rf ~/Google\ Drive/src/src_3D
-	cp -r Project/src ~/Google\ Drive/src/src_3D
-	cp requirements_collab.txt ~/Google\ Drive/src/src_3D/.
+	cp Project/Notebooks/$(notebook_colab).ipynb ~/$(gdrive_path)/Colab\ Notebooks/.
+	mkdir -p ~/$(gdrive_path)/data/$(data_colab)
+	mkdir -p ~/$(gdrive_path)/src/$(src_colab)
+	rm -rf ~/$(gdrive_path)/data/$(data_colab)
+	cp -r Project/data ~/$(gdrive_path)/data/$(data_colab)
+	rm -rf ~/$(gdrive_path)/src/$(src_colab)
+	cp -r Project/src ~/$(gdrive_path)/src/$(src_colab)
+	cp requirements_collab.txt ~/$(gdrive_path)/src/$(src_colab)/.
 
 update_drive_src:
-	rm -rf ~/Google\ Drive/src/src_3D
-	cp -r Project/src ~/Google\ Drive/src/src_3D
-	cp requirements_collab.txt ~/Google\ Drive/src/src_3D/.
+	rm -rf ~/$(gdrive_path)/src/$(src_colab)
+	cp -r Project/src ~/$(gdrive_path)/src/$(src_colab)
+	cp requirements_collab.txt ~/$(gdrive_path)/src/$(src_colab)/.
 
 update_notebook_from_colab:
-	cp ~/Google\ Drive/Colab\ Notebooks/$(notebook).ipynb Project/Notebooks/.
+	cp ~/$(gdrive_path)/Colab\ Notebooks/$(notebook_colab).ipynb Project/Notebooks/.
