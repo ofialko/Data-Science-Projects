@@ -13,7 +13,7 @@ from model2D import NetResDeep
 from utils import enumerateWithEstimate
 from pathlib import Path
 
-path_data = Path('drive/MyDrive/data/data_3D')
+#path_data = Path('drive/MyDrive/data/data_3D')
 
 METRICS_LABEL_NDX=0
 METRICS_PRED_NDX=1
@@ -26,7 +26,8 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 class TrainingApp:
-    def __init__(self,num_workers = 1, batch_size = 10, epochs = 10):
+    def __init__(self, path_data,num_workers = 1, batch_size = 10, epochs = 10, augmentation_dict = None, comment = ''):
+        self.path_data = path_data
         self.cli_args = namedtuple('cli_args',['batch_size', 'num_workers','epochs'])
         self.cli_args.batch_size = batch_size
         self.cli_args.num_workers = num_workers
@@ -34,6 +35,9 @@ class TrainingApp:
         self.use_cuda = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.use_cuda else "cpu")
         self.totalTrainingSamples_count = 0
+
+        self.augmentation_dict = augmentation_dict
+        self.comment = comment
 
         self.trn_writer = None
         self.val_writer = None
@@ -46,7 +50,7 @@ class TrainingApp:
         self.optimizer = self.initOptimizer()
         
     def initTrainDl(self):
-            train_ds = CifarDataset(path_data, isTrainSet_bool=True)
+            train_ds = CifarDataset(self.path_data, isTrainSet_bool=True, augmentation_dict = self.augmentation_dict)
 
             batch_size = self.cli_args.batch_size
             if self.use_cuda:
@@ -62,7 +66,7 @@ class TrainingApp:
             return train_dl
 
     def initValDl(self):
-        val_ds = CifarDataset(path_data, isTrainSet_bool=False)
+        val_ds = CifarDataset(self.path_data, isTrainSet_bool=False, augmentation_dict = self.augmentation_dict)
 
         batch_size = self.cli_args.batch_size
         if self.use_cuda:
@@ -79,7 +83,7 @@ class TrainingApp:
     
     def initOptimizer(self):
         #return SGD(self.model.parameters(), lr=0.001, momentum=0.99)
-        return Adam(self.model.parameters())
+        return Adam(self.model.parameters(), lr=0.001)
     
     def initModel(self):
         model = NetResDeep()
@@ -177,13 +181,13 @@ class TrainingApp:
 
     def initTensorboardWriters(self):
         if self.trn_writer is None:
-            log_dir = path_data / 'runs' / self.time_str
+            log_dir = self.path_data / 'runs' / self.time_str
             
 
             self.trn_writer = SummaryWriter(
-                log_dir=log_dir.as_posix() + '-trn_cls')
+                log_dir=log_dir.as_posix() + '-trn_cls' + self.comment)
             self.val_writer = SummaryWriter(
-                log_dir=log_dir.as_posix() + '-val_cls')
+                log_dir=log_dir.as_posix() + '-val_cls' + self.comment)
     
     
     def main(self):
