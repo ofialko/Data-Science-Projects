@@ -1,7 +1,25 @@
 import logging 
 import datetime, time
+from pathlib import Path
+from requests import get
 
 log = logging.getLogger(__name__)
+
+import sys
+from pathlib import Path
+from requests import get
+
+def get_paths():
+    # get notebook name
+    notebook_name = Path(get('http://172.28.0.2:9000/api/sessions').json()[0]['name']).stem
+    # setup paths
+    src_name  = 'src_'+'_'.join(notebook_name.split('_')[1:])
+    data_name = 'data_'+'_'.join(notebook_name.split('_')[1:])
+
+    path_src  = Path(f'drive/MyDrive/src/{src_name}')
+    path_data = Path(f'drive/MyDrive/data/{data_name}')
+    return path_src, path_data
+
 
 class UnNormalize(object):
     def __init__(self, mean, std):

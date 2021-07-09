@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
 
 import numpy as np
+import matplotlib.pyplot as plt
 import datetime
 from collections import namedtuple
 from dsets2D import CifarDataset
@@ -17,8 +18,9 @@ from pathlib import Path
 
 METRICS_LABEL_NDX=0
 METRICS_PRED_NDX=1
-METRICS_LOSS_NDX=2
-METRICS_SIZE = 3
+METRICS_PRED_P_NDX=2
+METRICS_LOSS_NDX=3
+METRICS_SIZE = 4
 
 from config.logconfig import logging
 log = logging.getLogger(__name__)
@@ -26,12 +28,18 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 class TrainingApp:
-    def __init__(self, path_data,num_workers = 1, batch_size = 10, epochs = 10, augmentation_dict = None, comment = ''):
+    def __init__(self, path_data,num_workers = 1, 
+                        batch_size = 64, 
+                        epochs = 100, 
+                        learning_rate = 0.001,
+                        augmentation_dict = None, 
+                        comment = ''):
         self.path_data = path_data
         self.cli_args = namedtuple('cli_args',['batch_size', 'num_workers','epochs'])
         self.cli_args.batch_size = batch_size
         self.cli_args.num_workers = num_workers
         self.cli_args.epochs = epochs
+        self.cli_args.lr = learning_rate
         self.use_cuda = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.use_cuda else "cpu")
         self.totalTrainingSamples_count = 0
@@ -83,7 +91,7 @@ class TrainingApp:
     
     def initOptimizer(self):
         #return SGD(self.model.parameters(), lr=0.001, momentum=0.99)
-        return Adam(self.model.parameters(), lr=0.001)
+        return Adam(self.model.parameters(), lr=self.cli_args.lr)
     
     def initModel(self):
         model = NetResDeep()
@@ -195,7 +203,7 @@ class TrainingApp:
 
         train_dl = self.initTrainDl()
         val_dl = self.initValDl()
-
+        best_score = 0.0
         for epoch_ndx in range(1, self.cli_args.epochs + 1):
 
             log.info("Epoch {} of {}, {}/{} batches of size {}*{}".format(
@@ -211,7 +219,8 @@ class TrainingApp:
             self.logMetrics(epoch_ndx, 'trn', trnMetrics_t)
 
             valMetrics_t = self.doValidation(epoch_ndx, val_dl)
-            self.logMetrics(epoch_ndx, 'val', valMetrics_t)
+            score = self.logMetrics(epoch_ndx, 'val', valMetrics_t)
+            # saving the bext model
 
         if hasattr(self, 'trn_writer'):
             self.trn_writer.close()
@@ -271,25 +280,33 @@ class TrainingApp:
         metrics_dict['pr/f1_score'] = \
             2 * (precision * recall) / (precision + recall)
 
+        threshold = torch.linspace(1, 0)
+        tpr = (metrics_t[None, METRICS_PRED_P_NDX, posLabel_mask] >= threshold[:, None]).sum(1).float() / pos_count
+        fpr = (metrics_t[None, METRICS_PRED_P_NDX, negLabel_mask] >= threshold[:, None]).sum(1).float() / neg_count
+        fp_diff = fpr[1:]-fpr[:-1]
+        tp_avg  = (tpr[1:]+tpr[:-1])/2
+        auc = (fp_diff * tp_avg).sum()
+        metrics_dict['auc'] = auc
+
         log.info(
             ("E{} {:8} {loss/all:.4f} loss, "
                  + "{correct/all:-5.1f}% correct, "
                  + "{pr/precision:.4f} precision, "
                  + "{pr/recall:.4f} recall, "
-                 + "{pr/f1_score:.4f} f1 score"
+                 + "{pr/f1_score:.4f} f1 score, "
+                 + "{auc:.4f} auc"
             ).format(
                 epoch_ndx,
                 mode_str,
                 **metrics_dict,
             )
         )
-        
         log.info(
             ("E{} {:8} {loss/neg:.4f} loss, "
                  + "{correct/neg:-5.1f}% correct ({neg_correct:} of {neg_count:})"
             ).format(
                 epoch_ndx,
-                mode_str + '_neg',
+                mode_str + '_' + 'neg',
                 neg_correct=neg_correct,
                 neg_count=neg_count,
                 **metrics_dict,
@@ -300,7 +317,7 @@ class TrainingApp:
                  + "{correct/pos:-5.1f}% correct ({pos_correct:} of {pos_count:})"
             ).format(
                 epoch_ndx,
-                mode_str + '_pos',
+                mode_str + '_' + 'pos',
                 pos_correct=pos_correct,
                 pos_count=pos_count,
                 **metrics_dict,
@@ -310,32 +327,30 @@ class TrainingApp:
         writer = getattr(self, mode_str + '_writer')
 
         for key, value in metrics_dict.items():
+            #key = key.replace('pos', pos)
+            #key = key.replace('neg', neg)
             writer.add_scalar(key, value, self.totalTrainingSamples_count)
 
-        writer.add_pr_curve(
-            'pr',
-            metrics_t[METRICS_LABEL_NDX],
-            metrics_t[METRICS_PRED_NDX],
+        fig = plt.figure()
+        plt.plot(fpr, tpr)
+        writer.add_figure('roc', fig, self.totalTrainingSamples_count)
+
+        writer.add_scalar('auc', auc, self.totalTrainingSamples_count)
+
+
+        bins = np.linspace(0, 1)
+
+        writer.add_histogram(
+            'label_neg',
+            metrics_t[METRICS_PRED_P_NDX, negLabel_mask],
             self.totalTrainingSamples_count,
+            bins=bins
+        )
+        writer.add_histogram(
+            'label_pos',
+            metrics_t[METRICS_PRED_P_NDX, posLabel_mask],
+            self.totalTrainingSamples_count,
+            bins=bins
         )
 
-        bins = [x/50.0 for x in range(51)]
-
-        negHist_mask = negLabel_mask & (metrics_t[METRICS_PRED_NDX] > 0.01)
-        posHist_mask = posLabel_mask & (metrics_t[METRICS_PRED_NDX] < 0.99)
-
-        if negHist_mask.any():
-            writer.add_histogram(
-                'is_neg',
-                metrics_t[METRICS_PRED_NDX, negHist_mask],
-                self.totalTrainingSamples_count,
-                bins=bins,
-            )
-        if posHist_mask.any():
-            writer.add_histogram(
-                'is_pos',
-                metrics_t[METRICS_PRED_NDX, posHist_mask],
-                self.totalTrainingSamples_count,
-                bins=bins,
-            )
-
+        return metrics_dict['auc']
