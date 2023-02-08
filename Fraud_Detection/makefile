@@ -1,4 +1,5 @@
-project := $(shell basename $(abspath $(dir $$PWD)))
+project_ := $(shell basename $(abspath $(dir $$PWD)))
+project = $(shell echo $(project_) | tr A-Z a-z)
 
 gdrive_path = Google\ Drive
 
@@ -16,7 +17,7 @@ models_colab_path = ~/$(gdrive_path)/models/$(models_colab)
 notebook_colab_path = ~/$(gdrive_path)/Colab\ Notebooks
 
 build:
-	docker build -t $(image) .
+	docker buildx build --platform=linux/amd64 -t $(image) .
 
 run:
 	docker run -v $$(pwd)/Project:/tmp/myapp -p 8888:8888 --rm --name $(container) $(image)
