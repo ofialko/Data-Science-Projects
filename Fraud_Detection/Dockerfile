@@ -2,7 +2,8 @@ FROM python:3.8-slim
 
 ENV PYTHONPATH="/tmp/myapp"
 
-# RUN apt update
+RUN apt update
+RUN apt -y install build-essential
 # RUN apt install -y curl
 # RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 # RUN apt install -y nodejs
